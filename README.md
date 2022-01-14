@@ -3,9 +3,9 @@ An on-chain generated Bohr-Model-based Elements NFTs.
 
 This project has been split into the following folders:
 
-onchain
+**onchain**
 
-frontend
+**frontend**
 
 The on chain folder contains the smart contract side of the project, while the front end folder contains the UI, and data management.
 
