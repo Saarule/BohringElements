@@ -3,9 +3,11 @@
 
 pragma solidity >=0.8.0 <0.9.0;
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "./Base64.sol";
 
 contract BohringElements is ERC721Enumerable, Ownable {
   using Strings for uint256;
@@ -13,10 +15,19 @@ contract BohringElements is ERC721Enumerable, Ownable {
   string[] public elementsValues = ["H", "He", "O", "C", "Ne", "Fe", "N", "Si", "Mg", "Mg", "S", "Ar", "Ca", "Ni", "Al", "Na", "Cr", "Mn", "P", "Co", "Ti", "K", "V", "Cl", "F", "Zn", "Ge", "Cu", "Zr", "Sr", "Kr", "Se", "Sc", "Pb", "Ce", "Ba", "Xe", "Rb", "Ga", "As", "Br", "Li", "Pt", "Sn", "Ir", "Cd", "Pd", "Hg", "I", "B", "Be", "Cs", "Bi", "Au", "Ag", "Rh", "Tl", "W", "In", "U" ];
 
   mapping (uint256 => string) public tokenMetadata;
-
   mapping (string => uint256[]) public elementsDetails;
+  uint256 price = 0.005 ether;
 
-  uint price = 0.005 ether;
+  struct Element { 
+      string name;
+      string description;
+      string bgHue;
+      string sunHue;
+      string earthHue;
+      string textHue;
+      string value;
+   }
+  mapping (uint256 => Element) public elements;
   
   constructor() ERC721("Bohring Elements", "BOE") {
     elementsDetails["H"] = [1];
@@ -83,16 +94,27 @@ contract BohringElements is ERC721Enumerable, Ownable {
   // public
   function mint() public payable {
     uint256 supply = totalSupply();
-    require(supply + 1 <= 10000000);
+    // require(supply + 1 <= 10000000); Without this line, there is an infinite number of possible mints.
+
+    Element memory newElement = Element(
+        string(abi.encodePacked('Bohring Elements #', uint256(supply + 1).toString())), 
+        "Bohring Elements are on-chain generated NFTs",
+        randomNum(361, block.difficulty, supply).toString(),
+        randomNum(361, block.difficulty, block.timestamp).toString(),
+        randomNum(361, block.timestamp, block.difficulty).toString(),
+        randomNum(361, block.timestamp, supply).toString(),
+        elementsValues[randomNum(elementsValues.length, block.difficulty, supply)]);
   
     if (msg.sender != owner()) {
       require(msg.value >= price);
     }
-    buildMetadata(supply);
-    _safeMint(msg.sender, supply);
-    supply = supply + 1;
-    //This make the price increse by 1% each time
+    string memory temp = buildMetadata(supply + 1);
+    elements[supply + 1] = newElement;
+    _safeMint(msg.sender, supply + 1);
+    //This make the price increase by 1% each time
     price = (price * 101) / 100;
+    console.log(string(abi.encodePacked("Minted element ", supply, " for ", price, " ether")));
+    console.log(string(abi.encodePacked("TokenURI is: ", temp)));
   }
 
   function randomNum(uint256 _mod, uint256 _seed, uint _salt) public view returns(uint256) {
@@ -149,13 +171,13 @@ contract BohringElements is ERC721Enumerable, Ownable {
       tokenMetadata[_tokenId] = string(abi.encodePacked(
               'data:application/json;base64,', Base64.encode(bytes(abi.encodePacked(
                           '{"name":"', 
-                          symbol,
-                          '", "description":"', 
-                          string(abi.encodePacked('Bohring Elements #', _tokenId.toString())), 
+                          string(abi.encodePacked('Bohring Elements #', _tokenId.toString())),
+                          '", "description":"',  
                           "Bohring Elements are on-chain generated NFTs",
                           '", "image": "', 
                           'data:image/svg+xml;base64,', 
                           Base64.encode(bytes(BohrModel(symbol, 250, 250))),
+                          '", "attributes": [{"trait_type": "Symbol", "value":"',symbol,'"}]',
                           '"}')))));
       return tokenMetadata[_tokenId];
   }
@@ -168,72 +190,4 @@ contract BohringElements is ERC721Enumerable, Ownable {
     (bool os, ) = payable(owner()).call{value: address(this).balance}("");
     require(os);
   }
-}
-
-
-
-///////////////////////////////////**********************************************///////////////////////////////////
-
-//Base64 Part of the code//
-pragma solidity ^0.8.0;
-
-/// @title Base64
-/// @author Brecht Devos - <brecht@loopring.org>
-/// @notice Provides a function for encoding some bytes in base64
-library Base64 {
-    string internal constant TABLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-
-    function encode(bytes memory data) internal pure returns (string memory) {
-        if (data.length == 0) return '';
-        
-        // load the table into memory
-        string memory table = TABLE;
-
-        // multiply by 4/3 rounded up
-        uint256 encodedLen = 4 * ((data.length + 2) / 3);
-
-        // add some extra buffer at the end required for the writing
-        string memory result = new string(encodedLen + 32);
-
-        assembly {
-            // set the actual output length
-            mstore(result, encodedLen)
-            
-            // prepare the lookup table
-            let tablePtr := add(table, 1)
-            
-            // input ptr
-            let dataPtr := data
-            let endPtr := add(dataPtr, mload(data))
-            
-            // result ptr, jump over length
-            let resultPtr := add(result, 32)
-            
-            // run over the input, 3 bytes at a time
-            for {} lt(dataPtr, endPtr) {}
-            {
-               dataPtr := add(dataPtr, 3)
-               
-               // read 3 bytes
-               let input := mload(dataPtr)
-               
-               // write 4 characters
-               mstore(resultPtr, shl(248, mload(add(tablePtr, and(shr(18, input), 0x3F)))))
-               resultPtr := add(resultPtr, 1)
-               mstore(resultPtr, shl(248, mload(add(tablePtr, and(shr(12, input), 0x3F)))))
-               resultPtr := add(resultPtr, 1)
-               mstore(resultPtr, shl(248, mload(add(tablePtr, and(shr( 6, input), 0x3F)))))
-               resultPtr := add(resultPtr, 1)
-               mstore(resultPtr, shl(248, mload(add(tablePtr, and(        input,  0x3F)))))
-               resultPtr := add(resultPtr, 1)
-            }
-            
-            // padding with '='
-            switch mod(mload(data), 3)
-            case 1 { mstore(sub(resultPtr, 2), shl(240, 0x3d3d)) }
-            case 2 { mstore(sub(resultPtr, 1), shl(248, 0x3d)) }
-        }
-        
-        return result;
-    }
 }
