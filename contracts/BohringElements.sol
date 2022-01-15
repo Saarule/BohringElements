@@ -15,6 +15,8 @@ contract BohringElements is ERC721Enumerable, Ownable {
   mapping (uint256 => string) public tokenMetadata;
 
   mapping (string => uint256[]) public elementsDetails;
+
+  uint price = 0.005 ether;
   
   constructor() ERC721("Bohring Elements", "BOE") {
     elementsDetails["H"] = [1];
@@ -81,14 +83,16 @@ contract BohringElements is ERC721Enumerable, Ownable {
   // public
   function mint() public payable {
     uint256 supply = totalSupply();
-    require(supply + 1 <= 100000);
+    require(supply + 1 <= 10000000);
   
     if (msg.sender != owner()) {
-      require(msg.value >= 0.005 ether);
+      require(msg.value >= price);
     }
     buildMetadata(supply);
     _safeMint(msg.sender, supply);
     supply = supply + 1;
+    //This make the price increse by 1% each time
+    price = (price * 101) / 100;
   }
 
   function randomNum(uint256 _mod, uint256 _seed, uint _salt) public view returns(uint256) {
