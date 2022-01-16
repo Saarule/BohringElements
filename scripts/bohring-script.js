@@ -21,9 +21,9 @@ async function main() {
   const mint = await bohring.mint();
   await mint.wait();
 
-  const tokenURI = await bohring.totalsupply;
+  const mint2 = await bohring.mint();
+  await mint2.wait();
 
-  console.log("Number of minted elements: ", supply);
   console.log("BohringElements deployed to:", bohring.address);
 }
 

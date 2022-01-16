@@ -117,7 +117,7 @@ contract BohringElements is ERC721Enumerable, Ownable {
     console.log(string(abi.encodePacked("TokenURI is: ", temp)));
   }
 
-  function randomNum(uint256 _mod, uint256 _seed, uint _salt) public view returns(uint256) {
+  function randomNum(uint256 _mod, uint256 _seed, uint256 _salt) public view returns(uint256) {
       uint256 num = uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, _seed, _salt))) % _mod;
       return num;
   }
@@ -151,7 +151,16 @@ contract BohringElements is ERC721Enumerable, Ownable {
   }
 
   function BohrModel(string memory symbol, uint256 x, uint256 y) public payable returns (string memory) {
-    string memory text = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 500 500'><style>.base { fill: white; font-family: serif; font-size: 16px; } .sun { fill: rgb(83,175,255); opacity: 0.4; } .Earth-orbit { fill: none; stroke: rgb(83,175,255); stroke-width: 1; opacity: 0.6;} .Earth { fill: rgb(83,175,255); }</style><rect width='100%' height='100%' fill='black' />";
+    string memory num1 = randomNum(361, block.difficulty, x).toString();
+    console.log(string(abi.encodePacked("Random number 1: ", num1)));
+    string memory num2 = randomNum(361, block.difficulty, block.timestamp).toString();
+    console.log(string(abi.encodePacked("Random number 2: ", num2)));
+    string memory num3 = randomNum(361, block.timestamp, block.difficulty).toString();
+    console.log(string(abi.encodePacked("Random number 3: ", num3)));
+    string memory text = "";
+    text = string(abi.encodePacked(text, "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 500 500'><style>.base { fill: white; font-family: serif; font-size: 16px; } .sun { fill: rgb(",num3,",175,",num1,"); opacity: 0.4; } .Earth-orbit { fill: none; stroke: rgb(",num2,",175,255); stroke-width: 1; opacity: 0.6;} .Earth { fill: rgb(",num1,",175,255); }</style><rect width='100%' height='100%' fill='black' />"));
+    // string memory text = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 500 500'><style>.base { fill: white; font-family: serif; font-size: 16px; } .sun { fill: rgb(83,175,255); opacity: 0.4; } .Earth-orbit { fill: none; stroke: rgb(83,175,255); stroke-width: 1; opacity: 0.6;} .Earth { fill: rgb(83,175,255); }</style><rect width='100%' height='100%' fill='black' />";
+    // string memory text = string(abi.encodePacked('<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500"><style>.base { fill: white; font-family: serif; font-size: 16px; } .sun { fill: hsl(50, 50%, 75%); opacity: 0.4; } .Earth-orbit { fill: none; stroke: rgb(83,175,255); stroke-width: 1; opacity: 0.6;} .Earth { fill: hsl(70, 50%, 75%); }</style><rect width="100%" height="100%" fill: hsl(60, 50%, 75%) />'));
     uint256 i = 0;
     uint[] memory arr = elementsDetails[symbol];
     while (i < arr.length) {
