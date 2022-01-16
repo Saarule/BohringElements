@@ -1,3 +1,88 @@
+
+@import url(https://fonts.googleapis.com/css?family=Rajdhani:300);
+html, body {
+  background-color: rgba(33, 33, 33, 1);
+  width: 100%;
+  height: 100%;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px;
+}
+
+.scifiUI {
+  list-style: none;
+  position: relative;
+  width: 600px;
+  margin: 50px auto;
+  padding: 0;
+  font-size: 1em;
+  color: rgba(0, 190, 190, 1);
+}
+
+li {
+  display: inline-block;
+}
+
+li input[type="radio"] {
+  opacity: 0;
+  position: absolute;
+  outline: none;
+}
+
+li input[type="radio"]:checked ~ label {
+  background: rgba(0, 190, 190, 1);
+  color: rgba(33, 33, 33, 1);
+  height: 50px;
+  font-size: 1.5em;
+  font-weight: bolder;
+  cursor: default;
+}
+
+li input[type="radio"]:checked ~ .section {
+  opacity: 1;
+  width: 500px;
+  padding: 50px;
+  border: 1px solid rgba(0, 190, 190, 1);
+  color: rgba(0, 220, 220, 1);
+  letter-spacing: 0.1em;
+  text-indent: 1em;
+  z-index: 1;
+}
+
+li label {
+  display: block;
+  width: 500px;
+  height: 40px;
+  border: 1px solid rgba(0, 190, 190, .7);
+  border-bottom: 0;
+  border-radius: 5px 5px 0 0;
+  color: rgba(0, 190, 190, .7);
+  line-height: 50px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+}
+
+li label:hover {
+  height: 50px;
+  border-color: rgba(0, 190, 190, 1);
+  color: rgba(0, 190, 190, 1);
+}
+
+li .section {
+  opacity: 0;
+  position: absolute;
+  top: 51px;
+  left: 0;
+  width: 1000px;
+  padding: 50px;
+  border: 1px solid rgba(0, 190, 190, 1);
+  background: rgba(0, 190, 190, .1);
+  color: rgba(255, 255, 255, 1);
+  letter-spacing: -1em;
+  text-indent: 1em;
+  transition: all 200ms ease-in-out;
+}
+
 .App {
   height: 100vh;
   background-color: #0d1116;
@@ -35,31 +120,25 @@
   -webkit-text-fill-color: transparent;
 }
 
-.cta-button {
-  height: 45px;
-  border: 0;
-  width: auto;
-  padding-left: 40px;
-  padding-right: 40px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  color: white;
-}
-
 .connect-wallet-button {
-  background: -webkit-linear-gradient(left, #60c657, #35aee2);
-  background-size: 200% 200%;
-  animation: gradient-animation 4s ease infinite;
+  background: rgba(0, 190, 190, 1);
+  color: rgba(33, 33, 33, 1);
+  width: 200px;
+  height: 50px;
+  border: 1px solid rgba(0, 190, 190, .7);
+  border-radius: 5px 5px 5px 5px;
+  font-size: 1.3em;
+  font-weight: bold;
+  font-family: 'Rajdhani', sans-serif;
+  cursor: default;
+  transition: all 200ms ease-in-out;
 }
 
-.mint-button {
-  background: -webkit-linear-gradient(left, #a200d6, #ff6fdf);
-  background-size: 200% 200%;
-  animation: gradient-animation 4s ease infinite;
-  margin-right: 15px;
+.connect-wallet-button:hover {
+  height: 50px;
+  box-shadow: 0 0 10px rgba(0, 220, 220, 1);
 }
+
 
 .opensea-button {
   background-color: rgb(32, 129, 226);
@@ -75,7 +154,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-bottom: 30px;
+  padding-top: 30px;
+  padding-bottom: 10px;
 }
 
 .twitter-logo {
@@ -87,39 +167,4 @@
   color: white;
   font-size: 16px;
   font-weight: bold;
-}
-
-/* KeyFrames */
-@-webkit-keyframes gradient-animation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-@-moz-keyframes gradient-animation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-@keyframes gradient-animation {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
 }

@@ -3,8 +3,7 @@ import { ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import BohringElements from './utils/BohringElements.json';
 
-const OPENSEA_LINK = '';
-const CONTRACT_ADDRESS = "0xc5a5c42992decbae36851359345fe25997f5c42d";
+const CONTRACT_ADDRESS = "0xEa21F841753015EFB3071764dc4EC1A086718EB0";
 
 const App = () => {
 
@@ -80,12 +79,11 @@ const App = () => {
         const connectedContract = new ethers.Contract(CONTRACT_ADDRESS, BohringElements.abi, signer);
 
         console.log("Going to pop wallet now to pay gas...")
-        let nftTxn = await connectedContract.mint({value: ethers.utils.parseEther('0.005')});
+        let nftTxn = await connectedContract.mint();
 
         console.log("Mining...please wait.")
         await nftTxn.wait();
         console.log(nftTxn);
-        console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`);
 
       } else {
         console.log("Ethereum object doesn't exist!");
@@ -94,20 +92,19 @@ const App = () => {
       console.log(error)
     }
   }
-
-
+  
   useEffect(() => {
     checkIfWalletIsConnected();
   }, [])
 
   const renderNotConnectedContainer = () => (
-    <button onClick={connectWallet} className="cta-button connect-wallet-button">
+    <button onClick={connectWallet} className="connect-wallet-button">
       Connect to Wallet
     </button>
   );
 
   const renderMintUI = () => (
-    <button onClick={askContractToMintNft} className="cta-button connect-wallet-button">
+    <button onClick={askContractToMintNft} className="connect-wallet-button">
       Mint NFT
     </button>
   )
@@ -115,13 +112,28 @@ const App = () => {
   return (
     <div className="App">
       <div className="container">
-        <div className="header-container">
-          <p className="header gradient-text">Bohring Elements</p>
-          <p className="sub-text">
-            Each unique. Each beautiful. Discover your NFT today.
-          </p>
-          {currentAccount === "" ? renderNotConnectedContainer() : renderMintUI()}
-        </div>
+        <ul class="scifiUI">
+          <li>
+            <input type="radio" name="tab" id="tab1" checked/>
+            <label for="tab1">Bohring Elements</label>
+            <div class="section">
+              The Bohring Elements are an experiment of on-chain generative artworks on the Polygon blockchain.
+              <br>
+              </br>
+              <br>
+              </br>
+              Elements are randomly minted based on their weighted abundance in the universe and display as animated Bohr Models.
+              <br>
+              </br>
+              <br>
+              </br>
+              The project was inspired by Niels Henrik David Bohr whom developed the namesake model of the atom, in which he proposed that energy levels of electrons are discrete and that the electrons revolve in stable orbits around the atomic nucleus but can jump from one energy level (or orbit) to another.
+              <div class="footer-container">
+                {currentAccount === "" ? renderNotConnectedContainer() : renderMintUI()}
+              </div>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
   );

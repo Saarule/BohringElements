@@ -102,7 +102,7 @@ contract BohringElements is ERC721Enumerable, Ownable {
       return num;
   }
 
-  function electronShell(uint256 electrons, uint256 radius, uint256 x, uint256 y) public pure returns (string memory) {
+  function electronShell(uint256 electrons, uint256 radius) public pure returns (string memory) {
     string memory shell = "";
     uint i = 1;
     uint current = 360;
@@ -111,18 +111,18 @@ contract BohringElements is ERC721Enumerable, Ownable {
     while (i <= electrons) {
       if (i == 1) {
         shell = string(abi.encodePacked(shell, "<g><animateTransform attributeName='transform' type='rotate' values='"));
-        shell = string(abi.encodePacked(shell, current.toString(), " ", x.toString(), " ", y.toString()));
-        shell = string(abi.encodePacked(shell, ";", " ", (current-split).toString(), " ", x.toString(), " ", y.toString(), "'"));
+        shell = string(abi.encodePacked(shell, current.toString(), " ", "250", " ", "250"));
+        shell = string(abi.encodePacked(shell, ";", " ", (current-split).toString(), " ", "250", " ", "250", "'"));
         shell = string(abi.encodePacked(shell, " ", "dur='", speed.toString(), "s' repeatCount='indefinite' /> <circle class='Earth-orbit' cx='"));
-        shell = string(abi.encodePacked(shell, x.toString(), "' cy='", y.toString(), "' r='", (20+(radius*5)).toString(), "'/> <circle class='Earth' cx='"));
-        shell = string(abi.encodePacked(shell, ((x-20)-(radius*5)).toString(), "' cy='", y.toString(), "' r='2' /></g>")); 
+        shell = string(abi.encodePacked(shell, "250", "' cy='", "250", "' r='", (20+(radius*5)).toString(), "'/> <circle class='Earth' cx='"));
+        shell = string(abi.encodePacked(shell, ((x-20)-(radius*5)).toString(), "' cy='", "250", "' r='2' /></g>")); 
       } else {
         shell = string(abi.encodePacked(shell, "<g><animateTransform attributeName='transform' type='rotate' values='"));
-        shell = string(abi.encodePacked(shell, current.toString(), " ", x.toString(), " ", y.toString()));
-        shell = string(abi.encodePacked(shell, ";", " ", (current-split).toString(), " ", x.toString(), " ", y.toString(), "'"));
+        shell = string(abi.encodePacked(shell, current.toString(), " ", "250", " ", "250"));
+        shell = string(abi.encodePacked(shell, ";", " ", (current-split).toString(), " ", "250", " ", "250", "'"));
         shell = string(abi.encodePacked(shell, " ", "dur='", speed.toString(), "s' repeatCount='indefinite' /> <circle stroke='none' fill='none' cx='"));
-        shell = string(abi.encodePacked(shell, x.toString(), "' cy='", y.toString(), "' r='", (20+(radius*5)).toString(), "'/> <circle class='Earth' cx='"));
-        shell = string(abi.encodePacked(shell, ((x-20)-(radius*5)).toString(), "' cy='", y.toString(), "' r='2' /></g>")); 
+        shell = string(abi.encodePacked(shell, "250", "' cy='", "250", "' r='", (20+(radius*5)).toString(), "'/> <circle class='Earth' cx='"));
+        shell = string(abi.encodePacked(shell, ((x-20)-(radius*5)).toString(), "' cy='", "250", "' r='2' /></g>")); 
       }
       current = current-split;
       i = i + 1;
@@ -130,18 +130,18 @@ contract BohringElements is ERC721Enumerable, Ownable {
     return shell;  
   }
 
-  function BohrModel(string memory symbol, uint256 x, uint256 y) public payable returns (string memory) {
+  function BohrModel(string memory symbol) public payable returns (string memory) {
     string memory text = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 500 500'><style>.base { fill: white; font-family: serif; font-size: 16px; } .sun { fill: rgb(83,175,255); opacity: 0.4; } .Earth-orbit { fill: none; stroke: rgb(83,175,255); stroke-width: 1; opacity: 0.6;} .Earth { fill: rgb(83,175,255); }</style><rect width='100%' height='100%' fill='black' />";
     uint256 i = 0;
     uint[] memory arr = elementsDetails[symbol];
     while (i < arr.length) {
       text = string(abi.encodePacked(text, "<g id='n", (i+1).toString(), "'>"));
-      text = string(abi.encodePacked(text, electronShell(arr[i], i, x, y)));
+      text = string(abi.encodePacked(text, electronShell(arr[i], i)));
       text = string(abi.encodePacked(text, "</g>"));
       i = i + 1;
     }
-    text = string(abi.encodePacked(text, "<circle class='sun' cx='", x.toString(), "' cy='", y.toString()));
-    text = string(abi.encodePacked(text, "' r='15'/> <text x='", x.toString(), "' y='", (y+2).toString()));
+    text = string(abi.encodePacked(text, "<circle class='sun' cx='", "250", "' cy='", "250"));
+    text = string(abi.encodePacked(text, "' r='15'/> <text x='", "250", "' y='", (252).toString()));
     text = string(abi.encodePacked(text, "' alignment-baseline='middle' text-anchor='middle' class='base'>", symbol, "</text>"));
     return string(abi.encodePacked(text, "</svg>"));
   }
@@ -157,7 +157,7 @@ contract BohringElements is ERC721Enumerable, Ownable {
                           "Bohring Elements are on-chain generated NFTs",
                           '", "image": "', 
                           'data:image/svg+xml;base64,', 
-                          Base64.encode(bytes(BohrModel(symbol, 250, 250))),
+                          Base64.encode(bytes(BohrModel(symbol))),
                           '"}')))));
       return tokenMetadata[_tokenId];
   }
