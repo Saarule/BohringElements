@@ -14,7 +14,6 @@ contract BohringElements is ERC721Enumerable, Ownable {
   
   string[] public elementsValues = ["H", "He", "O", "C", "Ne", "Fe", "N", "Si", "Mg", "Mg", "S", "Ar", "Ca", "Ni", "Al", "Na", "Cr", "Mn", "P", "Co", "Ti", "K", "V", "Cl", "F", "Zn", "Ge", "Cu", "Zr", "Sr", "Kr", "Se", "Sc", "Pb", "Ce", "Ba", "Xe", "Rb", "Ga", "As", "Br", "Li", "Pt", "Sn", "Ir", "Cd", "Pd", "Hg", "I", "B", "Be", "Cs", "Bi", "Au", "Ag", "Rh", "Tl", "W", "In", "U" ];
 
-  mapping (uint256 => string) public tokenMetadata;
   mapping (string => uint256[]) public elementsDetails;
   uint256 price = 0.005 ether;
 
@@ -95,16 +94,24 @@ contract BohringElements is ERC721Enumerable, Ownable {
   function mint() public payable {
     uint256 supply = totalSupply();
     // require(supply + 1 <= 10000000); Without this line, there is an infinite number of possible mints.
+
+    Element memory newElement = Element(
+    string(abi.encodePacked('Bohring Elements #', uint256(supply + 1).toString())), 
+    "Bohring Elements are on-chain generated NFTs",
+    randomNum(361, block.difficulty, supply).toString(),
+    randomNum(361, block.difficulty, block.timestamp).toString(),
+    randomNum(361, block.timestamp, block.difficulty).toString(),
+    randomNum(361, block.timestamp, block.difficulty+5).toString(),
+    elementsValues[randomNum(elementsValues.length, block.difficulty+9, block.timestamp)]);
   
     if (msg.sender != owner()) {
       require(msg.value >= price);
     }
-    string memory temp = buildMetadata(supply + 1);
+    
+    elements[supply + 1] = newElement;
     _safeMint(msg.sender, supply + 1);
     //This make the price increase by 1% each time
     price = (price * 101) / 100;
-    console.log(string(abi.encodePacked("Minted element ", supply, " for ", price, " ether")));
-    console.log(string(abi.encodePacked("TokenURI is: ", temp)));
   }
 
   function randomNum(uint256 _mod, uint256 _seed, uint256 _salt) public view returns(uint256) {
@@ -140,22 +147,14 @@ contract BohringElements is ERC721Enumerable, Ownable {
     return shell;  
   }
 
-  function BohrModel(string memory symbol, uint256 _tokenId, uint256 x, uint256 y) public payable returns (string memory) {
-    Element memory newElement = Element(
-    string(abi.encodePacked('Bohring Elements # ', uint256(_tokenId).toString())), 
-    "Bohring Elements are on-chain generated NFTs",
-    randomNum(361, block.difficulty, x).toString(),
-    randomNum(361, block.difficulty, block.timestamp).toString(),
-    randomNum(361, block.timestamp, block.difficulty).toString(),
-    randomNum(361, block.timestamp, block.difficulty+5).toString(),
-    symbol);
+  function BohrModel(string memory symbol, uint256 _tokenId, uint256 x, uint256 y) public view returns (string memory) {
 
-    elements[_tokenId] = newElement;
-        
-    console.log(string(abi.encodePacked("Random number 1: ", newElement.num1)));
-    console.log(string(abi.encodePacked("Random number 2: ", newElement.num2)));
-    console.log(string(abi.encodePacked("Random number 3: ", newElement.num3)));
-    console.log(string(abi.encodePacked("Random number 4: ", newElement.num4)));
+
+    Element memory newElement = elements[_tokenId];
+    // console.log(string(abi.encodePacked("Random number 1: ", newElement.num1)));
+    // console.log(string(abi.encodePacked("Random number 2: ", newElement.num2)));
+    // console.log(string(abi.encodePacked("Random number 3: ", newElement.num3)));
+    // console.log(string(abi.encodePacked("Random number 4: ", newElement.num4)));
 
     string memory text = "";
     text = string(abi.encodePacked(text, "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 500 500'><style>.base { fill: hsl(",newElement.num1,", 50%, 50%); font-family: serif; font-size: 16px; } .sun { fill: hsl(",newElement.num2,", 50%, 50%); opacity: 0.4; } .Earth-orbit { fill: none; stroke: hsl(",newElement.num3,", 50%, 50%); stroke-width: 1; opacity: 0.6;} .Earth { fill: hsl(",newElement.num4,", 50%, 50%); }</style><rect width='100%' height='100%' fill='black' />"));
@@ -175,9 +174,8 @@ contract BohringElements is ERC721Enumerable, Ownable {
     return string(abi.encodePacked(text, "</svg>"));
   }
   
-  function buildMetadata(uint256 _tokenId) public returns(string memory) {
-      string memory symbol = elementsValues[randomNum(elementsValues.length, block.difficulty, _tokenId)];
-      tokenMetadata[_tokenId] = string(abi.encodePacked(
+  function buildMetadata(uint256 _tokenId, string memory symbol) public view returns(string memory) {
+      return string(abi.encodePacked(
               'data:application/json;base64,', Base64.encode(bytes(abi.encodePacked(
                           '{"name":"', 
                           string(abi.encodePacked('Bohring Elements #', _tokenId.toString())),
@@ -190,11 +188,12 @@ contract BohringElements is ERC721Enumerable, Ownable {
                           // '{"trait_type": "Color Values", "value":"',elements[_tokenId].num1 ,elements[_tokenId].num2,'"}',
                           ']',
                           '"}')))));
-      return tokenMetadata[_tokenId];
   }
 
   function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
-    return tokenMetadata[_tokenId];
+    Element memory newElement = elements[_tokenId];
+    require(_exists(_tokenId),"ERC721Metadata: URI query for nonexistent token");
+    return buildMetadata(_tokenId, newElement.symbol);
   }
 
   function withdraw() public payable onlyOwner {

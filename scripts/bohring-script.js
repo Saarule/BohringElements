@@ -24,6 +24,9 @@ async function main() {
   const mint2 = await bohring.mint();
   await mint2.wait();
 
+  const uri = await bohring.tokenURI(1);
+
+  console.log("Token URI:", uri);
   console.log("BohringElements deployed to:", bohring.address);
 }
 
