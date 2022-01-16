@@ -21,11 +21,11 @@ contract BohringElements is ERC721Enumerable, Ownable {
   struct Element { 
       string name;
       string description;
-      string bgHue;
-      string sunHue;
-      string earthHue;
-      string textHue;
-      string value;
+      string num1;
+      string num2;
+      string num3;
+      string num4;
+      string symbol;
    }
   mapping (uint256 => Element) public elements;
   
@@ -95,21 +95,11 @@ contract BohringElements is ERC721Enumerable, Ownable {
   function mint() public payable {
     uint256 supply = totalSupply();
     // require(supply + 1 <= 10000000); Without this line, there is an infinite number of possible mints.
-
-    Element memory newElement = Element(
-        string(abi.encodePacked('Bohring Elements #', uint256(supply + 1).toString())), 
-        "Bohring Elements are on-chain generated NFTs",
-        randomNum(361, block.difficulty, supply).toString(),
-        randomNum(361, block.difficulty, block.timestamp).toString(),
-        randomNum(361, block.timestamp, block.difficulty).toString(),
-        randomNum(361, block.timestamp, supply).toString(),
-        elementsValues[randomNum(elementsValues.length, block.difficulty, supply)]);
   
     if (msg.sender != owner()) {
       require(msg.value >= price);
     }
     string memory temp = buildMetadata(supply + 1);
-    elements[supply + 1] = newElement;
     _safeMint(msg.sender, supply + 1);
     //This make the price increase by 1% each time
     price = (price * 101) / 100;
@@ -150,15 +140,25 @@ contract BohringElements is ERC721Enumerable, Ownable {
     return shell;  
   }
 
-  function BohrModel(string memory symbol, uint256 x, uint256 y) public payable returns (string memory) {
-    string memory num1 = randomNum(361, block.difficulty, x).toString();
-    console.log(string(abi.encodePacked("Random number 1: ", num1)));
-    string memory num2 = randomNum(361, block.difficulty, block.timestamp).toString();
-    console.log(string(abi.encodePacked("Random number 2: ", num2)));
-    string memory num3 = randomNum(361, block.timestamp, block.difficulty).toString();
-    console.log(string(abi.encodePacked("Random number 3: ", num3)));
+  function BohrModel(string memory symbol, uint256 _tokenId, uint256 x, uint256 y) public payable returns (string memory) {
+    Element memory newElement = Element(
+    string(abi.encodePacked('Bohring Elements # ', uint256(_tokenId).toString())), 
+    "Bohring Elements are on-chain generated NFTs",
+    randomNum(361, block.difficulty, x).toString(),
+    randomNum(361, block.difficulty, block.timestamp).toString(),
+    randomNum(361, block.timestamp, block.difficulty).toString(),
+    randomNum(361, block.timestamp, block.difficulty+5).toString(),
+    symbol);
+
+    elements[_tokenId] = newElement;
+        
+    console.log(string(abi.encodePacked("Random number 1: ", newElement.num1)));
+    console.log(string(abi.encodePacked("Random number 2: ", newElement.num2)));
+    console.log(string(abi.encodePacked("Random number 3: ", newElement.num3)));
+    console.log(string(abi.encodePacked("Random number 4: ", newElement.num4)));
+
     string memory text = "";
-    text = string(abi.encodePacked(text, "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 500 500'><style>.base { fill: white; font-family: serif; font-size: 16px; } .sun { fill: rgb(",num3,",175,",num1,"); opacity: 0.4; } .Earth-orbit { fill: none; stroke: rgb(",num2,",175,255); stroke-width: 1; opacity: 0.6;} .Earth { fill: rgb(",num1,",175,255); }</style><rect width='100%' height='100%' fill='black' />"));
+    text = string(abi.encodePacked(text, "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 500 500'><style>.base { fill: hsl(",newElement.num1,", 50%, 50%); font-family: serif; font-size: 16px; } .sun { fill: hsl(",newElement.num2,", 50%, 50%); opacity: 0.4; } .Earth-orbit { fill: none; stroke: hsl(",newElement.num3,", 50%, 50%); stroke-width: 1; opacity: 0.6;} .Earth { fill: hsl(",newElement.num4,", 50%, 50%); }</style><rect width='100%' height='100%' fill='black' />"));
     // string memory text = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 500 500'><style>.base { fill: white; font-family: serif; font-size: 16px; } .sun { fill: rgb(83,175,255); opacity: 0.4; } .Earth-orbit { fill: none; stroke: rgb(83,175,255); stroke-width: 1; opacity: 0.6;} .Earth { fill: rgb(83,175,255); }</style><rect width='100%' height='100%' fill='black' />";
     // string memory text = string(abi.encodePacked('<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 500"><style>.base { fill: white; font-family: serif; font-size: 16px; } .sun { fill: hsl(50, 50%, 75%); opacity: 0.4; } .Earth-orbit { fill: none; stroke: rgb(83,175,255); stroke-width: 1; opacity: 0.6;} .Earth { fill: hsl(70, 50%, 75%); }</style><rect width="100%" height="100%" fill: hsl(60, 50%, 75%) />'));
     uint256 i = 0;
@@ -185,8 +185,10 @@ contract BohringElements is ERC721Enumerable, Ownable {
                           "Bohring Elements are on-chain generated NFTs",
                           '", "image": "', 
                           'data:image/svg+xml;base64,', 
-                          Base64.encode(bytes(BohrModel(symbol, 250, 250))),
-                          '", "attributes": [{"trait_type": "Symbol", "value":"',symbol,'"}]',
+                          Base64.encode(bytes(BohrModel(symbol, _tokenId, 250, 250))),
+                          '", "attributes": [{"trait_type": "Symbol", "value":"',symbol,'"},',
+                          // '{"trait_type": "Color Values", "value":"',elements[_tokenId].num1 ,elements[_tokenId].num2,'"}',
+                          ']',
                           '"}')))));
       return tokenMetadata[_tokenId];
   }
